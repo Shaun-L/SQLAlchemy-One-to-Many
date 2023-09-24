@@ -16,34 +16,87 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
         """(ADD DESCRIPTION)"""
         __tablename__ = table_name
 
+        course: Mapped["Course"] = relationship(back_populates="sections")
 
-        departmentAbbreviation: Mapped[str]
-        courseNumber: Mapped[int]
+        #foreign key constraint from courses in __table_args__
+        departmentAbbreviation: Mapped[str] = mapped_column("department_abbreviation", String(10), primary_key= True)
+        #foreign key constraint from courses in __table_args__
+        courseNumber: Mapped[int] = mapped_column("course_number", Integer, nullable=False, primary_key=True )
+        sectionNumber: Mapped[int] = mapped_column("section_number", Integer, nullable= False, primary_key=True)
 
-        sectionNumber: Mapped[int]
-        semester: Mapped[str]
-        sectionYear: Mapped[int]
-        building: Mapped[str]
-        room: Mapped[int]
-        schedule: Mapped[str]
-        startTime: Mapped[time]
-        instructor: Mapped[str]
+        #Either make lookup table with ('Fall', 'Winter', 'Spring', 'Summer I', or 'Summer II') or make those constraints artificially.
+        semester: Mapped[str] = mapped_column("semester", String(10), nullable= False, primary_key=True)
+        sectionYear: Mapped[int] = mapped_column("section_year", Integer, nullable=False, primary_key=True)
 
-        def __init__(self):
-            pass
+        #Make sure the database will only accept a value building from the list: (VEC, ECS, EN2, EN3, ET, and SSPA)
+        building: Mapped[str] = mapped_column("building", String(6), nullable=False)
+        room: Mapped[int] = mapped_column("room", Integer, nullable=False)
+
+        #Make sure the database only takes these values: (MW, TuTh, MWF, F, S)
+        schedule: Mapped[str] = mapped_column("schedule", String(6), nullable=False)
+        startTime: Mapped[str] = mapped_column("start_time", String(5), nullable=False)
+        instructor: Mapped[str] = mapped_column("instructor", String(80), nullable=False)
+
+        __table_args__ = (UniqueConstraint("section_year", "semester", "schedule", "start_time", "building", "room", name="sections_uk_01"),
+                           UniqueConstraint("section_year", "semester", "schedule", "start_time", "instructor", name="sections_uk_02"),
+                           ForeignKeyConstraint([departmentAbbreviation], [Course.departmentAbbreviation]),
+                           ForeignKeyConstraint([courseNumber], [Course.courseNumber]))
+
+        def __init__(self, course: Course, departmentAbbreviation, courseNumber, sectionNumber, semester, sectionYear, building, room, schedule, startTime, instructor):
+            self.course = set_course(course)
+            self.departmentAbbreviation = departmentAbbreviation
+            self.courseNumber = courseNumber
+            self.sectionNumber = sectionNumber
+            self.semester = semester
+            self.sectionYear = sectionYear
+            self.building = building
+            self.room = room
+            self.schedule = schedule
+            self.startTime = startTime
+            self.instructor = instructor
 
 elif introspection_type == INTROSPECT_TABLES:
     class Section(Base):
         __table__ = Table(table_name, Base.metadata, autoloud_with=engine)
-        """Not sure what else goes in here"""
 
-        def __init__(self):
-            pass
+        departmentAbbreviation: Mapped[str] = column_property(__table__.c.department_abbreviation)
+
+        course: Mapped["Course"] = relationship(back_populates="sections")
+        courseNumber: Mapped[int] = column_property(__table__.c.course_number)
+        sectionNumber: Mapped[int] = column_property(__table__.c.section_number)
+        sectionYear: Mapped[int] = column_property(__table__.c.section_year)
+        startTime: Mapped[str] = column_property(__table__.c.start_time)
+
+        def __init__(self, course: Course, departmentAbbreviation, courseNumber, sectionNumber, semester, sectionYear, building, room, schedule, startTime, instructor):
+            self.course = set_course(course)
+            self.departmentAbbreviation = departmentAbbreviation
+            self.courseNumber = courseNumber
+            self.sectionNumber = sectionNumber
+            self.semester = semester
+            self.sectionYear = sectionYear
+            self.building = building
+            self.room = room
+            self.schedule = schedule
+            self.startTime = startTime
+            self.instructor = instructor
+
 def set_course(self, course: Course):
-    pass
+    #Questioning the addition of this function into Section.py, not stated in assignment guidelines, but 'feels' neccessary to set relationship between course and section. Not sure if it is neccessary though.
+    self.course = course
+    self.departmentAbbreviation = course.departmentAbbreviation
+    self.courseNumber = course.courseNumber
 
 def __str__(self):
-    pass
+    return f"Department abbr: {self.departmentAbbreviation}" \
+           f"\nCourse Number: {self.courseNumber}" \
+           f"\nSection Number: {self.sectionNumber}" \
+           f"\nSemester: {self.semester}" \
+           f"\nSection Year: {self.sectionYear}" \
+           f"\nBuilding: {self.building}" \
+           f"\nRoom: {self.room}" \
+           f"\nSchedule: {self.schedule}" \
+           f"\nStart Time: {self.startTime}" \
+           f"\nInstructor: {self.instructor}"
 
-
+setattr(Section, 'set_course', set_course)
 setattr(Section, '__str__', __str__)

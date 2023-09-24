@@ -30,6 +30,7 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
         ForeignKey.  I show you how to do it in __table_args__ because you'll need
         that for the relationship from courses into sections.
         """
+
         departmentAbbreviation: Mapped[str] = mapped_column('department_abbreviation',
     #                                                       ForeignKey("departments.abbreviation"),
                                                             primary_key=True)
@@ -61,6 +62,7 @@ elif introspection_type == INTROSPECT_TABLES:
         department: Mapped["Department"] = relationship(back_populates="courses")
         # Otherwise, this property will be named course_number
         courseNumber: Mapped[int] = column_property(__table__.c.course_number)
+
 
         def __init__(self, department: Department, courseNumber: int, name: str, description: str, units: int):
             self.set_department(department)
