@@ -15,6 +15,7 @@ from constants import START_OVER, INTROSPECT_TABLES, REUSE_NO_INTROSPECTION
 #import IPython  # So that I can exit out to the console without leaving the application.
 from sqlalchemy import inspect  # map from column name to attribute name
 from pprint import pprint
+from datetime import time
 
 
 def add_department(session):

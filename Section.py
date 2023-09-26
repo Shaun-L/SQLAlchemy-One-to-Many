@@ -6,6 +6,7 @@ from sqlalchemy import UniqueConstraint, ForeignKeyConstraint
 from sqlalchemy import String, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship, column_property
 from sqlalchemy import Table
+from sqlalchemy.types import Time
 from constants import START_OVER, REUSE_NO_INTROSPECTION, INTROSPECT_TABLES
 
 table_name: str = "sections"                 # The physical name of this table
@@ -24,7 +25,7 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
         courseNumber: Mapped[int] = mapped_column("course_number", Integer, nullable=False, primary_key=True )
         sectionNumber: Mapped[int] = mapped_column("section_number", Integer, nullable= False, primary_key=True)
 
-        #Either make lookup table with ('Fall', 'Winter', 'Spring', 'Summer I', or 'Summer II') or make those constraints artificially.
+        #Make sure database only accepts these values: ('Fall', 'Winter', 'Spring', 'Summer I', or 'Summer II')
         semester: Mapped[str] = mapped_column("semester", String(10), nullable= False, primary_key=True)
         sectionYear: Mapped[int] = mapped_column("section_year", Integer, nullable=False, primary_key=True)
 
@@ -34,7 +35,7 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
 
         #Make sure the database only takes these values: (MW, TuTh, MWF, F, S)
         schedule: Mapped[str] = mapped_column("schedule", String(6), nullable=False)
-        startTime: Mapped[str] = mapped_column("start_time", String(5), nullable=False)
+        startTime: Mapped[Time] = mapped_column("start_time", Time, nullable=False)
         instructor: Mapped[str] = mapped_column("instructor", String(80), nullable=False)
 
         __table_args__ = (UniqueConstraint("section_year", "semester", "schedule", "start_time", "building", "room", name="sections_uk_01"),
@@ -65,7 +66,7 @@ elif introspection_type == INTROSPECT_TABLES:
         courseNumber: Mapped[int] = column_property(__table__.c.course_number)
         sectionNumber: Mapped[int] = column_property(__table__.c.section_number)
         sectionYear: Mapped[int] = column_property(__table__.c.section_year)
-        startTime: Mapped[str] = column_property(__table__.c.start_time)
+        startTime: Mapped[Time] = column_property(__table__.c.start_time)
 
         def __init__(self, course: Course, departmentAbbreviation, courseNumber, sectionNumber, semester, sectionYear, building, room, schedule, startTime, instructor):
             self.course = set_course(course)
