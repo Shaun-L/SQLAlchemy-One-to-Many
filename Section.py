@@ -21,7 +21,7 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
         departmentAbbreviation: Mapped[str] = mapped_column("department_abbreviation", primary_key=True)
         # foreign key constraint from courses in __table_args__
         courseNumber: Mapped[int] = mapped_column("course_number", primary_key=True)
-        _course: Mapped["Course"] = relationship(back_populates="sections")
+        course: Mapped["Course"] = relationship(back_populates="sections")
         sectionNumber: Mapped[int] = mapped_column("section_number", Integer, Identity(start=1, cycle=True),
                                                    nullable=False, primary_key=True)
 
@@ -61,7 +61,7 @@ elif introspection_type == INTROSPECT_TABLES:
 
         departmentAbbreviation: Mapped[str] = column_property(__table__.c.department_abbreviation)
 
-        _course: Mapped["Course"] = relationship(back_populates="sections")
+        course: Mapped["Course"] = relationship(back_populates="sections")
         courseNumber: Mapped[int] = column_property(__table__.c.course_number)
         sectionNumber: Mapped[int] = column_property(__table__.c.section_number)
         sectionYear: Mapped[int] = column_property(__table__.c.section_year)

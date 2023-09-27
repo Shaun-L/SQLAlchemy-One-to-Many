@@ -36,7 +36,7 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
     #                                                       ForeignKey("departments.abbreviation"),
                                                             primary_key=True)
         department: Mapped["Department"] = relationship(back_populates="courses")
-        sections: Mapped[List["Section"]] = relationship(back_populates="courses")
+        sections: Mapped[List["Section"]] = relationship(back_populates="course")
 
         courseNumber: Mapped[int] = mapped_column('course_number', Integer,
                                                   nullable=False, primary_key=True)
