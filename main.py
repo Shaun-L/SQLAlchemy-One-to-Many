@@ -123,6 +123,17 @@ def select_course(sess) -> Course:
                                        Course.courseNumber == course_number).first()
     return course
 
+def delete_course(sess):
+    """
+    asks the user for the course to delete by course abbreviation and deletes it
+    :param sess: connection to database
+    :return: None
+    """
+
+    print('Deleting Course')
+
+    course = select_course(sess)
+    sess.delete(course)
 
 def delete_department(session):
     """
