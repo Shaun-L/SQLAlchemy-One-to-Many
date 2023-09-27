@@ -7,6 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, column_property
 from sqlalchemy import Table
 from Department import Department
 from constants import START_OVER, REUSE_NO_INTROSPECTION, INTROSPECT_TABLES
+from typing import List
 """In this Entity, I decided to do everything in this file, even though it got a little
 busy.  So there is no CourseClass.py to go with the DepartmentClass.py file."""
 
@@ -35,6 +36,8 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
     #                                                       ForeignKey("departments.abbreviation"),
                                                             primary_key=True)
         department: Mapped["Department"] = relationship(back_populates="courses")
+        sections: Mapped[List["Section"]] = relationship(back_populates="courses")
+
         courseNumber: Mapped[int] = mapped_column('course_number', Integer,
                                                   nullable=False, primary_key=True)
         name: Mapped[str] = mapped_column('name', String(50), nullable=False)
@@ -44,8 +47,7 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
         # send to the database.  In this case, that we want two separate uniqueness
         # constraints (candidate keys).
         __table_args__ = (UniqueConstraint("department_abbreviation", "name", name="courses_uk_01"),
-                          ForeignKeyConstraint([departmentAbbreviation],
-                                               [Department.abbreviation]))
+                          ForeignKeyConstraint([departmentAbbreviation], [Department.abbreviation]))
 
         def __init__(self, department: Department, courseNumber: int, name: str, description: str, units: int):
             self.set_department(department)
@@ -60,6 +62,7 @@ elif introspection_type == INTROSPECT_TABLES:
         departmentAbbreviation: Mapped[str] = column_property(__table__.c.department_abbreviation)
         # This back_populates will not be created by the introspection.
         department: Mapped["Department"] = relationship(back_populates="courses")
+        sections: Mapped[List["Section"]] = relationship(back_populates="courses")
         # Otherwise, this property will be named course_number
         courseNumber: Mapped[int] = column_property(__table__.c.course_number)
 
@@ -83,11 +86,25 @@ def set_department(self, department: Department):
     self.department = department
     self.departmentAbbreviation = department.abbreviation
 
+def add_section(self, section):
+    if section not in self.sections:
+        self.sections.add(section)  # I believe this will update the course as well.
 
+
+def remove_section(self, section):
+    if section in self.sections:
+        self.sections.remove(section)
+
+
+def get_sections(self):
+    return self.sections
 def __str__(self):
     return f"Department abbrev: {self.departmentAbbreviation} number: {self.courseNumber} name: {self.name} units: {self.units}"
 
 
 """Add the two instance methods to the class, regardless of whether we introspect or not."""
+setattr(Course, 'add_section', add_section)
+setattr(Course, 'remove_section', remove_section)
+setattr(Course, 'get_sections', get_sections)
 setattr(Course, 'set_department', set_department)
 setattr(Course, '__str__', __str__)

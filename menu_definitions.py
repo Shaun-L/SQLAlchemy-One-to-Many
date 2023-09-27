@@ -22,6 +22,9 @@ menu_main = Menu('main', 'Please select one of the following options:', [
     Option("List all courses", "list_courses(sess)"),
     Option("List department courses", "list_department_courses(sess)"),
     Option("Move course to new department", "move_course_to_new_department(sess)"),
+    Option("Add section", "add_section(sess)"),
+    Option("Delete section", "delete_section(sess)"),
+    Option("List course sections", "list_sections(sess)"),
     Option("Commit", "sess.commit()"),
     Option("Break out into shell", "IPython.embed()"),
     Option("Exit", "pass")

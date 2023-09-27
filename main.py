@@ -16,6 +16,7 @@ from constants import START_OVER, INTROSPECT_TABLES, REUSE_NO_INTROSPECTION
 from sqlalchemy import inspect  # map from column name to attribute name
 from pprint import pprint
 from datetime import time
+from Section import Section
 
 
 def add_department(session):
@@ -80,6 +81,122 @@ def add_course(session):
     session.add(course)
 
 
+def validating_time() -> time:
+    valid_time = False
+    while not valid_time:
+        time_input = input("Start time--> ")
+        if len(time_input) != 7 or time_input[1] != ":":
+            print("Invalid input. Structure input like this -> '8:32 PM'.")
+        else:
+            valid_time = True
+            if time_input[5:] == "PM":
+                hours = int(time_input[0]) + 12
+            else:
+                hours = int(time_input[0])
+            minutes = int(time_input[2:4])
+    return time(hours, minutes, 0)
+
+
+def add_session(sess : Session):
+    print("Which course do you want to add a section to?")
+    course: Course = select_course(sess)
+    semester_list = ["fall", "winter", "spring", "summer i", "summer ii"]
+    building_list = ["VEC", "ECS", "EN2", "EN3", "EN4", "ET", "SSPA"]
+    schedule_list = ["MW", "TuTh", "MWF", "F", "S"]
+    unique_reservation = False
+
+    while not unique_reservation:
+        correct_semester = False
+        correct_building = False
+        correct_schedule = False
+        while not correct_semester:
+            semester = input("Semester offered--> ")
+            if semester.lower() not in semester_list:
+                print(f"Invalid input. Make sure you are selecting a valid semester.\nSelect one-> {semester_list}")
+            else:
+                correct_semester = True
+        sectionYear = int(input("Year offered--> "))
+        while not correct_schedule:
+            schedule = input("Days Scheduled--> ")
+            if schedule not in schedule_list:
+                print(f"Invalid input. Make sure you are selecting a valid schedule.\nSelect one-> {schedule_list}")
+            else:
+                correct_schedule = True
+        startTime: time = validating_time()
+        instructor = input("Instructor name--> ")
+        instructor_count: int = sess.query(Section).filter(Section.sectionYear == sectionYear, Section.semester == semester,
+                                                            Section.schedule == schedule, Section.startTime == startTime,
+                                                            Section.instructor == instructor).count()
+
+        unique_instructor_slot = instructor_count == 0
+        if not unique_instructor_slot:
+            print("That instructor is already booked for that time, please re-enter inputs.")
+        else:
+            while not correct_building:
+                building = input("Building name--> ")
+                if building not in building_list:
+                    print(f"Invalid input. Make sure you are choosing a valid building.\nSelect one-> {building_list}")
+                else:
+                    correct_building = True
+            room = int(input("Enter Room Number--> "))
+            reservation_count: int = sess.query(Section).filter(Section.sectionYear == sectionYear, Section.semester == semester,
+                                                            Section.schedule == schedule, Section.startTime == startTime,
+                                                            Section.building == building, Section.room == room).count()
+
+            unique_reservation = reservation_count == 0
+            if not unique_reservation:
+                print("The room selected is already booked, please re-enter inputs.")
+    section = Section(course, course.departmentAbbreviation, course.courseNumber, semester, sectionYear, building, room, schedule, startTime, instructor)
+    sess.add(Section)
+
+def select_section(sess: Session) -> Section:
+    found = False
+    abbreviation: str = ''
+    course_number: int = -1
+    section_number: int = -1
+    section_year: int = -1
+    semester: str = ''
+    while not found:
+        abbreviation = input("Department Abbreviation--> ")
+        course_number = int(input("Course Number--> "))
+        section_number = int(input("Section Number--> "))
+        section_year = int(input("Section Year--> "))
+        semester = input("Semester--> ")
+        unique_count = sess.query(Section).filter(Section.departmentAbbreviation == abbreviation,
+                                                  Section.courseNumber == course_number, Section.sectionNumber == section_number,
+                                                  Section.sectionYear == section_year, Section.semester == semester).count()
+
+        found = unique_count == 1
+        if not found:
+            print("No Sections with the given inputs. Try again.")
+    section = sess.query(Section).filter(Section.departmentAbbreviation == abbreviation,
+                                         Section.courseNumber == course_number, Section.sectionNumber == section_number,
+                                         Section.sectionYear == section_year, Section.semester == semester).first()
+    return section
+
+def list_sections(sess: Session):
+    found = False
+    abbreviation: str = ''
+    course_number: int = -1
+    while not found:
+        abbreviation = input("Department Abbreviation--> ")
+        course_number = int(input("Course Number--> "))
+        unique_count = sess.query(Section).filter(Section.departmentAbbreviation == abbreviation,
+                                                  Section.courseNumber == course_number).count()
+        found = unique_count >= 1
+        if not found:
+            print("No sections for that course. Try again")
+    sections: [Section] = list(sess.query(Section).filter(Section.departmentAbbreviation == abbreviation,
+                                                          Section.courseNumber == course_number))
+    print(f"Sections in {abbreviation} {course_number}:")
+    for section in sections:
+        print(section)
+
+def delete_section(sess):
+
+    section = select_section(sess)
+    sess.delete(section)
+
 def select_department(sess) -> Department:
     """
     Prompt the user for a specific department by the department abbreviation.
@@ -133,6 +250,14 @@ def delete_course(sess):
     print('Deleting Course')
 
     course = select_course(sess)
+    n_sections = sess.query(Section).filter(Section.departmentAbbreviation == course.departmentAbbreviation,
+                                            Section.courseNumber == course.courseNumber).count()
+    if n_sections > 0:
+        print(f"Sorry, there are {n_sections} sections in that course. Delete them first,"
+              f" then come back here to delete the course")
+    else:
+        sess.delete(course)
+
     sess.delete(course)
 
 def delete_department(session):
@@ -258,16 +383,16 @@ def list_department_courses(sess):
 
 if __name__ == '__main__':
     print('Starting off')
-    logging.basicConfig()
+    #logging.basicConfig()
     # use the logging factory to create our first logger.
     # for more logging messages, set the level to logging.DEBUG.
     # logging_action will be the text string name of the logging level, for instance 'logging.INFO'
-    logging_action = debug_select.menu_prompt()
+    #logging_action = debug_select.menu_prompt()
     # eval will return the integer value of whichever logging level variable name the user selected.
-    logging.getLogger("sqlalchemy.engine").setLevel(eval(logging_action))
+    #logging.getLogger("sqlalchemy.engine").setLevel(eval(logging_action))
     # use the logging factory to create our second logger.
     # for more logging messages, set the level to logging.DEBUG.
-    logging.getLogger("sqlalchemy.pool").setLevel(eval(logging_action))
+    #logging.getLogger("sqlalchemy.pool").setLevel(eval(logging_action))
 
     # Prompt the user for whether they want to introspect the tables or create all over again.
     introspection_mode: int = IntrospectionFactory().introspection_type
@@ -294,3 +419,4 @@ if __name__ == '__main__':
         sess.commit()
     print('Ending normally')
 
+#5gAg$v$H
