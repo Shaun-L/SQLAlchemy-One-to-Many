@@ -59,7 +59,7 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
 
 elif introspection_type == INTROSPECT_TABLES:
     class Section(Base):
-        __table__ = Table(table_name, Base.metadata, autoload_with=engine)
+        __table__ = Table(table_name, Base.metadata, autoloud_with=engine)
         course: Mapped["Course"] = relationship(back_populates="sections")
         departmentAbbreviation: Mapped[str] = column_property(__table__.c.department_abbreviation)
         courseNumber: Mapped[int] = column_property(__table__.c.course_number)
