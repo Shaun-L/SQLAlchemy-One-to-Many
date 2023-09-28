@@ -18,9 +18,9 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
         __tablename__ = table_name
 
         # foreign key constraint from courses in __table_args__
-        departmentAbbreviation: Mapped[str] = mapped_column("department_abbreviation", primary_key=True)
+        departmentAbbreviation: Mapped[str] = mapped_column("department_abbreviation", nullable=False, primary_key=True)
         # foreign key constraint from courses in __table_args__
-        courseNumber: Mapped[int] = mapped_column("course_number", primary_key=True)
+        courseNumber: Mapped[int] = mapped_column("course_number", nullable=False, primary_key=True)
         course: Mapped["Course"] = relationship(back_populates="sections")
         sectionNumber: Mapped[int] = mapped_column("section_number", Integer, Identity(start=1, cycle=True),
                                                    nullable=False, primary_key=True)
@@ -47,6 +47,8 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
 
         def __init__(self, course: Course, semester, sectionYear, building, room, schedule, startTime, instructor):
             self.set_course(course)
+            self.departmentAbbreviation = self.course.departmentAbbreviation
+            self.courseNumber = self.course.courseNumber
             self.semester = semester
             self.sectionYear = sectionYear
             self.building = building
@@ -58,10 +60,8 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
 elif introspection_type == INTROSPECT_TABLES:
     class Section(Base):
         __table__ = Table(table_name, Base.metadata, autoloud_with=engine)
-
-        departmentAbbreviation: Mapped[str] = column_property(__table__.c.department_abbreviation)
-
         course: Mapped["Course"] = relationship(back_populates="sections")
+        departmentAbbreviation: Mapped[str] = column_property(__table__.c.department_abbreviation)
         courseNumber: Mapped[int] = column_property(__table__.c.course_number)
         sectionNumber: Mapped[int] = column_property(__table__.c.section_number)
         sectionYear: Mapped[int] = column_property(__table__.c.section_year)
@@ -69,6 +69,8 @@ elif introspection_type == INTROSPECT_TABLES:
 
         def __init__(self, course: Course, semester, sectionYear, building, room, schedule, startTime, instructor):
             self.set_course(course)
+            self.departmentAbbreviation = self.course.departmentAbbreviation
+            self.courseNumber = self.course.courseNumber
             self.semester = semester
             self.sectionYear = sectionYear
             self.building = building

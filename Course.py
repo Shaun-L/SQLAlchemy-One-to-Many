@@ -62,7 +62,7 @@ elif introspection_type == INTROSPECT_TABLES:
         departmentAbbreviation: Mapped[str] = column_property(__table__.c.department_abbreviation)
         # This back_populates will not be created by the introspection.
         department: Mapped["Department"] = relationship(back_populates="courses")
-        sections: Mapped[List["Section"]] = relationship(back_populates="courses")
+        sections: Mapped[List["Section"]] = relationship(back_populates="course")
         # Otherwise, this property will be named course_number
         courseNumber: Mapped[int] = column_property(__table__.c.course_number)
 

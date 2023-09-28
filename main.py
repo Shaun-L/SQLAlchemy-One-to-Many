@@ -97,7 +97,7 @@ def validating_time() -> time:
     return time(hours, minutes, 0)
 
 
-def add_session(sess : Session):
+def add_section(sess : Session):
     print("Which course do you want to add a section to?")
     course: Course = select_course(sess)
     semester_list = ["fall", "winter", "spring", "summer i", "summer ii"]
@@ -146,8 +146,8 @@ def add_session(sess : Session):
             unique_reservation = reservation_count == 0
             if not unique_reservation:
                 print("The room selected is already booked, please re-enter inputs.")
-    section = Section(course, course.departmentAbbreviation, course.courseNumber, semester, sectionYear, building, room, schedule, startTime, instructor)
-    sess.add(Section)
+    section = Section(course, semester, sectionYear, building, room, schedule, startTime, instructor)
+    sess.add(section)
 
 def select_section(sess: Session) -> Section:
     found = False
