@@ -1,3 +1,4 @@
+import DepartmentClass
 from orm_base import Base
 from IntrospectionFactory import IntrospectionFactory
 from db_connection import engine
@@ -39,6 +40,10 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
         those class definition files."""
         courses: Mapped[List["Course"]] = DC.courses
         name: Mapped[str] = DC.name
+        chairName: Mapped[str] = DC.chairName
+        building: Mapped[str] = DC.building
+        officeNum: Mapped[int] = DC.officeNum
+        description: Mapped[str] = DC.description
         # __table_args__ can best be viewed as directives that we ask SQLAlchemy to
         # send to the database.  In this case, that we want two separate uniqueness
         # constraints (candidate keys).
@@ -48,9 +53,14 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
         leave that out when the class is initially declared, and then add it in afterwards.
         So I'm defining the exact same __init__ method both for the start over as well
         as the introspection case just to get past this interesting issue and move on."""
-        def __init__(self, abbreviation: str, name: str):
+        def __init__(self, abbreviation: str, name: str, chair_name: str, building: str, office: int, description: str):
             self.abbreviation = abbreviation
             self.name = name
+            self.chairName = chair_name
+            self.building = building
+            self.officeNum = office
+            self.description = description
+
 elif introspection_type == INTROSPECT_TABLES:
     # We need to connect to the database to introspect the table.  So I'm getting that done
     # now, rather than in main.  Connection is a singleton factory of sorts.
@@ -69,9 +79,13 @@ elif introspection_type == INTROSPECT_TABLES:
         # More on metadata: https://docs.sqlalchemy.org/en/20/core/metadata.html
         abbreviation: Mapped[str] = column_property(__table__.c.abbreviation)
 
-        def __init__(self, abbreviation: str, name: str):
+        def __init__(self, abbreviation: str, name: str, chair_name: str, building: str, office: int, description: str):
             self.abbreviation = abbreviation
             self.name = name
+            self.chairName = chair_name
+            self.building = building
+            self.officeNum = office
+            self.description = description
 
 """I tried to bring in __init__ from the imported code in each of these two (see below)
 ways, and in both cases when I tried to use the __init__ constructor, it blew up with
