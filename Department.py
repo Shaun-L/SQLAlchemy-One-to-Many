@@ -78,6 +78,7 @@ elif introspection_type == INTROSPECT_TABLES:
         # The __table__ attribute refers to the Table object that we created by introspection.
         # More on metadata: https://docs.sqlalchemy.org/en/20/core/metadata.html
         abbreviation: Mapped[str] = column_property(__table__.c.abbreviation)
+        chairName: Mapped[str] = column_property(__table__.c.chair_name)
 
         def __init__(self, abbreviation: str, name: str, chair_name: str, building: str, office: int, description: str):
             self.abbreviation = abbreviation

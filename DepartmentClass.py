@@ -39,5 +39,5 @@ def get_courses(self):
 def __str__(self):
     return f"Department abbreviation: {self.abbreviation} name: {self.name} \n" \
            f"number course offered: {len(self.courses)} \n" \
-           f"Department Chair: {self.chair_name}\nDepartment Office: {self.building} {self.office}\n" \
+           f"Department Chair: {self.chairName}\nDepartment Office: {self.building} {self.officeNum}\n" \
            f"Department Description: {self.description}"

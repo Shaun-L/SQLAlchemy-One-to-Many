@@ -86,7 +86,7 @@ def add_department(session):
             print("That office room is already occupied by another department. Try again.")
         elif not unique_desc:
             print("That description matches the description of another department. Try again.")
-    newDepartment = Department(departmentName, abbreviation, chairName, building, officeNum, description)
+    newDepartment = Department(abbreviation, departmentName, chairName, building, officeNum, description)
     session.add(newDepartment)
 
 def add_course(session):
