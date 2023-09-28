@@ -3,7 +3,7 @@ from orm_base import Base
 from db_connection import engine
 from IntrospectionFactory import IntrospectionFactory
 from sqlalchemy import UniqueConstraint, ForeignKeyConstraint
-from sqlalchemy import String, Integer, Column, Identity
+from sqlalchemy import String, Integer, Identity
 from sqlalchemy.orm import Mapped, mapped_column, relationship, column_property
 from sqlalchemy import Table
 from sqlalchemy.types import Time
@@ -47,8 +47,6 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
 
         def __init__(self, course: Course, semester, sectionYear, building, room, schedule, startTime, instructor):
             self.set_course(course)
-            self.departmentAbbreviation = self.course.departmentAbbreviation
-            self.courseNumber = self.course.courseNumber
             self.semester = semester
             self.sectionYear = sectionYear
             self.building = building
@@ -59,18 +57,16 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
 
 elif introspection_type == INTROSPECT_TABLES:
     class Section(Base):
-        __table__ = Table(table_name, Base.metadata, autoloud_with=engine)
-        course: Mapped["Course"] = relationship(back_populates="sections")
+        __table__ = Table(table_name, Base.metadata, autoload_with=engine)
         departmentAbbreviation: Mapped[str] = column_property(__table__.c.department_abbreviation)
         courseNumber: Mapped[int] = column_property(__table__.c.course_number)
+        course: Mapped["Course"] = relationship(back_populates="sections")
         sectionNumber: Mapped[int] = column_property(__table__.c.section_number)
         sectionYear: Mapped[int] = column_property(__table__.c.section_year)
         startTime: Mapped[Time] = column_property(__table__.c.start_time)
 
         def __init__(self, course: Course, semester, sectionYear, building, room, schedule, startTime, instructor):
             self.set_course(course)
-            self.departmentAbbreviation = self.course.departmentAbbreviation
-            self.courseNumber = self.course.courseNumber
             self.semester = semester
             self.sectionYear = sectionYear
             self.building = building
