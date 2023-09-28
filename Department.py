@@ -40,9 +40,9 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
         those class definition files."""
         courses: Mapped[List["Course"]] = DC.courses
         name: Mapped[str] = DC.name
-        chairName: Mapped[str] = DC.chairName
+        chair_name: Mapped[str] = DC.chair_name
         building: Mapped[str] = DC.building
-        officeNum: Mapped[int] = DC.officeNum
+        office: Mapped[int] = DC.office
         description: Mapped[str] = DC.description
         # __table_args__ can best be viewed as directives that we ask SQLAlchemy to
         # send to the database.  In this case, that we want two separate uniqueness
@@ -56,9 +56,9 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
         def __init__(self, abbreviation: str, name: str, chair_name: str, building: str, office: int, description: str):
             self.abbreviation = abbreviation
             self.name = name
-            self.chairName = chair_name
+            self.chair_name = chair_name
             self.building = building
-            self.officeNum = office
+            self.office = office
             self.description = description
 
 elif introspection_type == INTROSPECT_TABLES:
@@ -78,14 +78,14 @@ elif introspection_type == INTROSPECT_TABLES:
         # The __table__ attribute refers to the Table object that we created by introspection.
         # More on metadata: https://docs.sqlalchemy.org/en/20/core/metadata.html
         abbreviation: Mapped[str] = column_property(__table__.c.abbreviation)
-        chairName: Mapped[str] = column_property(__table__.c.chair_name)
+        chair_name: Mapped[str] = column_property(__table__.c.chair_name)
 
         def __init__(self, abbreviation: str, name: str, chair_name: str, building: str, office: int, description: str):
             self.abbreviation = abbreviation
             self.name = name
-            self.chairName = chair_name
+            self.chair_name = chair_name
             self.building = building
-            self.officeNum = office
+            self.office = office
             self.description = description
 
 """I tried to bring in __init__ from the imported code in each of these two (see below)

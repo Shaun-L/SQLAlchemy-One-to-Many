@@ -68,9 +68,9 @@ def add_department(session):
         description = input("Description of department --> ")
 
         abbr_count = session.query(Department).filter(Department.abbreviation == abbreviation).count()
-        chair_count = session.query(Department).filter(Department.chairName == chairName).count()
+        chair_count = session.query(Department).filter(Department.chair_name == chairName).count()
         office_count = session.query(Department).filter(Department.building == building,
-                                                        Department.officeNum == officeNum).count()
+                                                        Department.office == officeNum).count()
         desc_count = session.query(Department).filter(Department.description == description).count()
 
         unique_abbr = abbr_count == 0

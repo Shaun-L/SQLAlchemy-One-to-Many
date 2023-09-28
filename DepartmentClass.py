@@ -10,9 +10,9 @@ abbreviation: Mapped[str] = mapped_column('abbreviation', String,
                                           nullable=False, primary_key=True)
 courses: Mapped[List["Course"]] = relationship(back_populates="department")
 name: Mapped[str] = mapped_column('name', String(50), nullable=False)
-chairName: Mapped[str] = mapped_column('chair_name', String(80), nullable=False)
+chair_name: Mapped[str] = mapped_column('chair_name', String(80), nullable=False)
 building: Mapped[str] = mapped_column('building', String(10), nullable=False)
-officeNum: Mapped[int] = mapped_column('office', Integer, nullable=False)
+office: Mapped[int] = mapped_column('office', Integer, nullable=False)
 description: Mapped[str] = mapped_column('description', String(80), nullable=False)
 
 # __table_args__ can best be viewed as directives that we ask SQLAlchemy to
@@ -39,5 +39,5 @@ def get_courses(self):
 def __str__(self):
     return f"Department abbreviation: {self.abbreviation} name: {self.name} \n" \
            f"number course offered: {len(self.courses)} \n" \
-           f"Department Chair: {self.chairName}\nDepartment Office: {self.building} {self.officeNum}\n" \
+           f"Department Chair: {self.chair_name}\nDepartment Office: {self.building} {self.office}\n" \
            f"Department Description: {self.description}"
