@@ -34,7 +34,7 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
         room: Mapped[int] = mapped_column("room", Integer, nullable=False)
 
         # Make sure the database only takes these values: (MW, TuTh, MWF, F, S)
-        schedule: Mapped[str] = mapped_column("schedule", String(6), nullable=False)
+        schedule: Mapped[str] = mapped_column("schedule", String(6),CheckConstraint("schedule IN('MW', 'TuTh', 'MWF', 'F', 'S')"), nullable=False)
         startTime: Mapped[Time] = mapped_column("start_time", Time, nullable=False)
         instructor: Mapped[str] = mapped_column("instructor", String(80), nullable=False)
 
