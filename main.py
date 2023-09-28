@@ -56,7 +56,7 @@ def add_department(session):
     abbreviation: str = ''
     chairName: str = ''
     building: str = ''
-    officeNum: int = 0
+    office: int = 0
     description: str = ''
 
     while not unique_abbr or not unique_chair or not unique_office or not unique_desc:
@@ -64,13 +64,13 @@ def add_department(session):
         abbreviation = input("Department's abbreviation --> ")
         chairName = input("Department Chair name --> ")
         building = input("Building name --> ")
-        officeNum = int(input("Office number --> "))
+        office = int(input("Office number --> "))
         description = input("Description of department --> ")
 
         abbr_count = session.query(Department).filter(Department.abbreviation == abbreviation).count()
         chair_count = session.query(Department).filter(Department.chairName == chairName).count()
         office_count = session.query(Department).filter(Department.building == building,
-                                                        Department.officeNum == officeNum).count()
+                                                        Department.office == office).count()
         desc_count = session.query(Department).filter(Department.description == description).count()
 
         unique_abbr = abbr_count == 0
@@ -86,7 +86,7 @@ def add_department(session):
             print("That office room is already occupied by another department. Try again.")
         elif not unique_desc:
             print("That description matches the description of another department. Try again.")
-    newDepartment = Department(abbreviation, departmentName, chairName, building, officeNum, description)
+    newDepartment = Department(abbreviation, departmentName, chairName, building, office, description)
     session.add(newDepartment)
 
 def add_course(session):
@@ -127,15 +127,26 @@ def validating_time() -> time:
     valid_time = False
     while not valid_time:
         time_input = input("Start time--> ")
-        if len(time_input) != 7 or time_input[1] != ":":
+        if len(time_input) != 7 and len(time_input) != 8:
             print("Invalid input. Structure input like this -> '8:32 PM'.")
         else:
-            valid_time = True
-            if time_input[5:] == "PM":
-                hours = int(time_input[0]) + 12
+            if time_input[1] == ":":
+                valid_time = True
+                if time_input[5:] == "PM":
+                    hours = int(time_input[0]) + 12
+                else:
+                    hours = int(time_input[0])
+                minutes = int(time_input[2:4])
+            elif time_input[2] == ":":
+                valid_time = True
+                if time_input[6:] == "PM":
+                    hours = int(time_input[0:2]) + 12
+                else:
+                    hours = int(time_input[0:2])
+                minutes = int(time_input[3:5])
             else:
-                hours = int(time_input[0])
-            minutes = int(time_input[2:4])
+                print("Invalid input. Structure input like this -> '8:32 PM'.")
+
     return time(hours, minutes, 0)
 
 

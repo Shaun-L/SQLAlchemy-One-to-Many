@@ -88,16 +88,16 @@ def set_course(self, course: Course):
 
 
 def __str__(self):
-    return f"Department abbr: {self.departmentAbbreviation}" \
-           f"\nCourse Number: {self.courseNumber}" \
-           f"\nSection Number: {self.sectionNumber}" \
-           f"\nSemester: {self.semester}" \
-           f"\nSection Year: {self.sectionYear}" \
-           f"\nBuilding: {self.building}" \
-           f"\nRoom: {self.room}" \
-           f"\nSchedule: {self.schedule}" \
-           f"\nStart Time: {self.startTime}" \
-           f"\nInstructor: {self.instructor}"
+    return f"\nSection Number: {self.sectionNumber}" \
+           f"\nDepartment abbr: {self.departmentAbbreviation}," \
+           f"Course Number: {self.courseNumber}," \
+           f"Semester: {self.semester}" \
+           f"\nSection Year: {self.sectionYear}," \
+           f"Building: {self.building}," \
+           f"Room: {self.room}" \
+           f"\nSchedule: {self.schedule}," \
+           f"Start Time: {self.startTime}," \
+           f"Instructor: {self.instructor}"
 
 
 setattr(Section, 'set_course', set_course)

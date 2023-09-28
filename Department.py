@@ -42,7 +42,7 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
         name: Mapped[str] = DC.name
         chairName: Mapped[str] = DC.chairName
         building: Mapped[str] = DC.building
-        officeNum: Mapped[int] = DC.officeNum
+        office: Mapped[int] = DC.office
         description: Mapped[str] = DC.description
         # __table_args__ can best be viewed as directives that we ask SQLAlchemy to
         # send to the database.  In this case, that we want two separate uniqueness
@@ -58,7 +58,7 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
             self.name = name
             self.chairName = chair_name
             self.building = building
-            self.officeNum = office
+            self.office = office
             self.description = description
 
 elif introspection_type == INTROSPECT_TABLES:
@@ -85,7 +85,7 @@ elif introspection_type == INTROSPECT_TABLES:
             self.name = name
             self.chairName = chair_name
             self.building = building
-            self.officeNum = office
+            self.office = office
             self.description = description
 
 """I tried to bring in __init__ from the imported code in each of these two (see below)
